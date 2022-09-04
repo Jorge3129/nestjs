@@ -1,5 +1,5 @@
 import metaDataStorage from "../../metadata/MetaDataStorage";
-import { ParamType } from "../../models/ParamInfo";
+import { ParamType } from "../../metadata/types/ParamInfo";
 
 export const HttpParamsFactory =
   (type: ParamType) =>

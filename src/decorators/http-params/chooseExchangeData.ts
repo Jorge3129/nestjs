@@ -1,4 +1,4 @@
-import { ParamInfo, ParamType } from "../../models/ParamInfo";
+import { ParamInfo, ParamType } from "../../metadata/types/ParamInfo";
 import { HttpExchange } from "../../models/http-exchange";
 
 type RequestProp = ParamType.PARAM | ParamType.QUERY | ParamType.BODY;
