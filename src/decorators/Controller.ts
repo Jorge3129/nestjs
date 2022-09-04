@@ -1,5 +1,6 @@
 import metaDataStorage from "../metadata/MetaDataStorage";
 import { ConstructorParam } from "../metadata/types/ConstructorParam";
+import { formatPath } from "../route-mapper/route.utils";
 
 export const Controller = (path: string = "/"): ClassDecorator => {
   return <T extends Function>(target: T): T | void => {
@@ -18,10 +19,12 @@ export const Controller = (path: string = "/"): ClassDecorator => {
       constructorParams[paramIndex].token = token;
     });
 
+    const formattedPath = formatPath(path);
+
     metaDataStorage.controllerMap.set(target.name, {
+      path: formattedPath,
       target: target as any,
       constructorParams,
-      path,
       handlers,
     });
 

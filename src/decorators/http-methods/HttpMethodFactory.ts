@@ -1,5 +1,6 @@
 import metaDataStorage from "../../metadata/MetaDataStorage";
 import { HttpMethod } from "../../constants/http-method";
+import { formatPath } from "../../route-mapper/route.utils";
 
 export const HttpMethodFactory =
   (httpMethod: HttpMethod) =>
@@ -13,11 +14,13 @@ export const HttpMethodFactory =
         .sort((a, b) => a.index - b.index)
         .concat();
 
+      const formattedPath = formatPath(path);
+
       metaDataStorage.handlers.push({
+        path: formattedPath,
         descriptor,
         params,
         httpMethod,
-        path,
         propertyKey,
       });
 
