@@ -1,8 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
 import { DebugLogger } from "../logger/DebugLogger";
-import { HandlerInfo } from "../metadata/types/HandlerInfo";
-import { chooseExchangeData } from "../decorators/http-params/chooseExchangeData";
-import { HttpExchange } from "../models/http-exchange";
 import { ModuleInfo } from "../metadata/types/ModuleInfo";
 import { Injector } from "../injection/Injector";
 import {
@@ -12,8 +8,8 @@ import {
 import { RouteConfig, RouterConfig } from "./RouteConfig";
 import { ControllerInfo } from "../metadata/types/ControllerInfo";
 import { ModuleControllerResolver } from "../metadata/ModuleControllerResolver";
-
-type RawHandler = (...args: any[]) => any;
+import { RouteHandlerMapper } from "./RouteHandlerMapper";
+import { HandlerInfo } from "../metadata/types/HandlerInfo";
 
 type ObjectLiteral = Record<PropertyKey, any>;
 
@@ -27,9 +23,11 @@ export class RouteMapper {
 
     if (!controllerInfos) throw new NoControllersForModule(moduleInfo.target);
 
-    const routers: RouterConfig[] = [];
+    return this.extractRouters(controllerInfos);
+  }
 
-    for (const controllerInfo of controllerInfos) {
+  private extractRouters(controllerInfos: ControllerInfo[]): RouterConfig[] {
+    return controllerInfos.map((controllerInfo) => {
       const { path, target } = controllerInfo;
 
       const token = target.name;
@@ -40,26 +38,26 @@ export class RouteMapper {
 
       if (!controller) throw new NoControllerInstance(controllerInfo.target);
 
-      const routes = this.extractRoutes({ controller, controllerInfo });
+      const { handlers } = controllerInfo;
 
-      routers.push({ routes, path: controllerInfo.path });
-    }
+      const routes = this.extractRoutes({ handlers, controller });
 
-    return routers;
+      return { path, routes };
+    });
   }
 
   private extractRoutes(params: {
+    handlers: HandlerInfo[];
     controller: ObjectLiteral;
-    controllerInfo: ControllerInfo;
   }): RouteConfig[] {
-    const { controller, controllerInfo } = params;
+    const { controller, handlers } = params;
 
-    return controllerInfo.handlers.map((handlerInfo): RouteConfig => {
+    return handlers.map((handlerInfo): RouteConfig => {
       const { httpMethod, path } = handlerInfo;
 
       const handler = controller[handlerInfo.propertyKey];
 
-      const newHandler = this.createHandler({
+      const newHandler = RouteHandlerMapper.createHandler({
         handler: handler.bind(controller),
         handlerInfo,
       });
@@ -71,35 +69,5 @@ export class RouteMapper {
 
       return { handler: newHandler, httpMethod, path };
     });
-  }
-
-  private createHandler(params: {
-    handler: RawHandler;
-    handlerInfo: HandlerInfo;
-  }): RequestHandler {
-    const { handler, handlerInfo } = params;
-
-    return async (req: Request, res: Response, next: NextFunction) => {
-      const promisifiedHandler = await this.promisify(handler);
-      const args = this.resolveParams(handlerInfo, { req, res, next });
-      const result = await promisifiedHandler(...args);
-      res.send(result);
-    };
-  }
-
-  private promisify(rawHandler: RawHandler): (...args: any[]) => Promise<any> {
-    return (...args: any[]): Promise<any> => {
-      const result = rawHandler(...args);
-      return result instanceof Promise ? result : Promise.resolve(result);
-    };
-  }
-
-  private resolveParams(
-    handlerInfo: HandlerInfo,
-    exchange: HttpExchange
-  ): any[] {
-    return handlerInfo.params.map((paramInfo) =>
-      chooseExchangeData(exchange, paramInfo)
-    );
   }
 }
