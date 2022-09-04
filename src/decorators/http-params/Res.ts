@@ -1,5 +1,5 @@
-import { ParamType } from "../../metadata/types/ParamInfo";
-import { HttpParamsFactory } from "./HttpParamsFactory";
+import { RouteType } from "../../metadata/types/ParamInfo";
+import { HttpRouteFactory } from "./HttpRouteFactory";
 
-export const Res = HttpParamsFactory(ParamType.RESPONSE);
+export const Res = HttpRouteFactory(RouteType.RESPONSE);
 export const Response = Res;

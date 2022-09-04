@@ -1,4 +1,4 @@
-import { ParamType } from "../../metadata/types/ParamInfo";
-import { HttpParamsFactory } from "./HttpParamsFactory";
+import { RouteType } from "../../metadata/types/ParamInfo";
+import { HttpRouteFactory } from "./HttpRouteFactory";
 
-export const Next = HttpParamsFactory(ParamType.NEXT);
+export const Next = HttpRouteFactory(RouteType.NEXT);
