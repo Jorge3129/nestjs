@@ -1,7 +1,6 @@
-import express from "express";
 import { RouteMapper } from "../route-mapper/RouteMapper";
 import metaDataStorage from "../metadata/MetaDataStorage";
-import { InstanceLoader } from "../injection/InstanceLoader";
+import { Injector } from "../injection/Injector";
 import { NestApplication } from "./NestApplication";
 import { ModuleNotFoundException } from "../exceptions/internal-exceptions";
 import { DebugLogger } from "../logger/DebugLogger";
@@ -10,6 +9,7 @@ export class NestFactory {
   private static logger: DebugLogger = DebugLogger.getInstance();
 
   public static async create(moduleClass: Function): Promise<NestApplication> {
+    this.logger.logMessage(NestFactory, "Starting Nest application...");
     try {
       const routeMapper = new RouteMapper();
 
@@ -17,19 +17,18 @@ export class NestFactory {
 
       if (!moduleInfo) throw new ModuleNotFoundException(moduleClass);
 
-      InstanceLoader.resolveModule(moduleInfo);
+      Injector.resolveModule(moduleInfo);
 
-      const app = express();
+      const app = new NestApplication();
 
-      app.use(express.json());
+      const routers = routeMapper.mapForModule(moduleInfo);
+      app.registerRouters(routers);
 
-      routeMapper.mapForModule(app, moduleInfo);
-
-      return new NestApplication(app);
+      return app;
     } catch (e) {
       const error = e as Error;
 
-      this.logger.logError(error.message, NestFactory);
+      this.logger.logError(NestFactory, error.message);
 
       return Promise.reject(e);
     }
