@@ -1,26 +1,42 @@
 {
   "name": "nest1",
   "version": "1.0.0",
-  "description": "",
-  "main": "src/index.ts",
+  "description": "A simplified clone of NestJS",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "prepare": "npm run build",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags"
   },
-  "keywords": [],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jorge3129/hs_orm.git"
+  },
+  "keywords": [
+    "Node.js",
+    "Express",
+    "NestJS",
+    "TypeScript"
+  ],
+  "author": "Heorhii Sanchenko",
   "license": "ISC",
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
-    "prettier": "2.7.1"
+    "prettier": "2.7.1",
+    "ts-node": "^10.9.1"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dayjs": "^1.11.5",
     "express": "^4.18.1",
-    "nodemon": "^2.0.19",
     "reflect-metadata": "^0.1.13",
-    "ts-node": "^10.9.1"
-  }
+    "rxjs": "^7.5.6"
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }
