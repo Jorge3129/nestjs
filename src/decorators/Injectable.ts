@@ -3,10 +3,8 @@ import { ConstructorParam } from "../metadata/types/ConstructorParam";
 
 export const Injectable = (): ClassDecorator => {
   return <T extends Function>(target: T): T | void => {
-    const paramTypes: Function[] = Reflect.getMetadata(
-      "design:paramtypes",
-      target
-    );
+    const paramTypes: Function[] =
+      Reflect.getMetadata("design:paramtypes", target) ?? [];
 
     const injectParams = metaDataStorage.injectParams;
 
