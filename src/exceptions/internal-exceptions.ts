@@ -1,13 +1,18 @@
-export class NoDependencyForControllerException extends Error {
-  constructor(controller: Function, dependency: Function) {
-    const message = `Cannot resolve dependency ${dependency.name} of  controller ${controller.name}`;
+import { InjectionToken, Provider } from "../providers/Provider";
+import { getTokenFromProvider } from "../providers/provider.utils";
+import { getStringFromToken } from "../providers/getStringFromToken";
+
+export class NoDependencyException extends Error {
+  constructor(controller: Function, token: InjectionToken) {
+    const name = getStringFromToken(token);
+    const message = `Cannot resolve dependency ${name} of  controller ${controller.name}`;
     super(message);
   }
 }
 
 export class ProviderNotFoundException extends Error {
-  constructor(provider: Function) {
-    const message = `Provider ${provider.name} not found`;
+  constructor(provider: Provider) {
+    const message = `Provider ${getTokenFromProvider(provider)} not found`;
     super(message);
   }
 }
@@ -33,9 +38,9 @@ export class ModuleNotFoundException extends Error {
   }
 }
 
-export class ControllerNotFoundException extends Error {
+export class InvalidControllerException extends Error {
   constructor(controller: Function) {
-    const message = `Controller ${controller.name} not found`;
+    const message = `An invalid controller ${controller.name} has been detected. Perhaps, one of your controllers is missing @Controller() decorator.`;
     super(message);
   }
 }
