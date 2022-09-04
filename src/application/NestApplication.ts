@@ -1,9 +1,15 @@
-import express, { Application } from "express";
+import express, {
+  Application,
+  Request,
+  Response,
+  ErrorRequestHandler,
+} from "express";
 import { RouterConfig } from "../route-mapper/RouteConfig";
 import { INestApplication } from "./INestApplication";
 
 export class NestApplication implements INestApplication {
   private app: Application;
+  private exceptionHandler: ErrorRequestHandler;
 
   constructor() {
     const app = express();
@@ -14,6 +20,7 @@ export class NestApplication implements INestApplication {
   public listen(port: number): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
+        this.app.use(this.exceptionHandler);
         this.app.listen(port, () => {
           resolve();
         });
@@ -23,7 +30,7 @@ export class NestApplication implements INestApplication {
     });
   }
 
-  enableCors(options?: Object): void {}
+  public enableCors(options?: Object): void {}
 
   public registerRouters(routerConfigs: RouterConfig[]): void {
     for (const routerConfig of routerConfigs) {
@@ -39,5 +46,9 @@ export class NestApplication implements INestApplication {
 
       this.app.use(path, router);
     }
+  }
+
+  public registerExceptionHandler(handler: ErrorRequestHandler): void {
+    this.exceptionHandler = handler;
   }
 }

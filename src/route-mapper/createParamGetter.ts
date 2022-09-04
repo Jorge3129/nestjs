@@ -24,7 +24,6 @@ export const createParamGetter = (paramInfo: ParamInfo) => {
       );
 
       return paramInfo.pipes.reduce((result, pipe) => {
-        console.log(result, typeof result);
         return typeof pipe === "function"
           ? new pipe().transform(result)
           : pipe.transform(result);

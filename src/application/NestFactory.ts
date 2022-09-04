@@ -4,6 +4,7 @@ import { Injector } from "../injection/Injector";
 import { NestApplication } from "./NestApplication";
 import { ModuleNotFoundException } from "../exceptions/internal-exceptions";
 import { DebugLogger } from "../logger/DebugLogger";
+import { globalExceptionHandler } from "../exceptions/global-exception-handler";
 
 export class NestFactory {
   private static logger: DebugLogger = DebugLogger.getInstance();
@@ -23,6 +24,8 @@ export class NestFactory {
 
       const routers = routeMapper.mapForModule(moduleInfo);
       app.registerRouters(routers);
+
+      app.registerExceptionHandler(globalExceptionHandler);
 
       return app;
     } catch (e) {

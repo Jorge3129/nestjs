@@ -3,6 +3,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { createParamGetter } from "./createParamGetter";
 import { HttpExchange } from "../models/http-exchange";
 import { lastValueFrom, Observable } from "rxjs";
+import { globalExceptionHandler } from "../exceptions/global-exception-handler";
 
 export type RawHandler = (...args: any[]) => any;
 
@@ -17,11 +18,16 @@ export class RouteHandlerMapper {
 
     const paramGetters: ParamGetter[] = this.resolveParams(handlerInfo);
 
+    const promisifiedHandler = this.promisify(handler);
+
     return async (req: Request, res: Response, next: NextFunction) => {
-      const promisifiedHandler = await this.promisify(handler);
-      const args = paramGetters.map((get) => get({ res, req, next }));
-      const result = await promisifiedHandler(...args);
-      res.send(result);
+      try {
+        const args = paramGetters.map((get) => get({ res, req, next }));
+        const result = await promisifiedHandler(...args);
+        res.send(result);
+      } catch (e: any) {
+        globalExceptionHandler(e, req, res);
+      }
     };
   }
 
@@ -29,11 +35,15 @@ export class RouteHandlerMapper {
     rawHandler: RawHandler
   ): (...args: any[]) => Promise<any> {
     return (...args: any[]): Promise<any> => {
-      const result = rawHandler(...args);
+      try {
+        const result = rawHandler(...args);
 
-      if (result instanceof Observable) return lastValueFrom(result);
-      if (result instanceof Promise) return result;
-      return Promise.resolve(result);
+        if (result instanceof Observable) return lastValueFrom(result);
+        if (result instanceof Promise) return result;
+        return Promise.resolve(result);
+      } catch (e) {
+        throw e;
+      }
     };
   }
 
