@@ -1,6 +1,6 @@
 {
   "name": "@heorhii.sanchenko/nestjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simplified clone of NestJS",
   "main": "lib/index.js",
   "scripts": {
