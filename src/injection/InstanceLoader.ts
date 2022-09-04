@@ -1,12 +1,9 @@
 import { DebugLogger } from "../logger/DebugLogger";
 import { ModuleInfo } from "../metadata/types/ModuleInfo";
 import { ModuleMetadataResolver } from "../metadata/ModuleMetadataResolver";
-import { getTokenFromProvider } from "../providers/provider.utils";
 import { InstanceContainer } from "./InstanceContainer";
 import { ControllerResolver } from "./ControllerResolver";
 import { ProviderResolver } from "./ProviderResolver";
-
-const resolvedMessage = (name: string) => `Resolved dependecies of ${name}`;
 
 export class InstanceLoader {
   private logger: DebugLogger = DebugLogger.getInstance();
