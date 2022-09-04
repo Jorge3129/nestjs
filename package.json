@@ -1,5 +1,5 @@
 {
-  "name": "nest1",
+  "name": "@heorhii.sanchenko/nestjs",
   "version": "1.0.0",
   "description": "A simplified clone of NestJS",
   "main": "lib/index.js",
